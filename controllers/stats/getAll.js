@@ -10,6 +10,7 @@ let FIND_SEQUENCE = [1, 1, 0, 1, 1, 0, 1, 1, 0]
 let count = []
 let dataAfter = []
 let COUNT_AFTER = 10
+let DATE_AFTER = []
 // 90%
 let secondCount = []
 // 80%
@@ -22,7 +23,22 @@ let stats = {
 }
 
 const getAll = async (req, res, next) => {
-  const stats = find()
+  FIND_SEQUENCE = req.query.seq.split(',')
+  DATE_AFTER = req?.query?.dateAfter?.split(',')
+  const stats = []
+  DATE_AFTER.map(date=>{
+    const data = []
+    let [from, to] = date.split('-')
+    while (Number(from) <= Number(to)) {
+      COUNT_AFTER = from
+      const obj = find()
+      data.push({stats: obj, h: from})
+      from++;
+    }
+    stats.push({data, label:date})
+  })
+  
+
   // const { page = 1, limit = 10 } = req.query;
   // console.log(req.query)
   // const skip = (page - 1) * limit;
@@ -46,11 +62,11 @@ const find = ()=>{
     second:{},
     third:{}
   }
+  charts = []
   secondCount = []
   thirdCount = []
   this.dataAfter = []
   count = findSequence(FIND_SEQUENCE, data)
-  console.log(count)
   let [dataAfter, croppedArray] = findDateAfter(count, data)
   // ONLY FOR CHARTS (maybe)
   let randomDataAfter = getRandomData(dataAfter)
@@ -58,11 +74,12 @@ const find = ()=>{
   stats.randomFirst = getStats(randomDataAfter)
 
   dataAfter = dataForChart(dataAfter)
+  charts.push({p:'100', data: dataAfter})
   stats.first = getStats(dataAfter)
   // renderCharts('generalLineChart', generalChart.nativeElement, dataAfter)
   // ------------------
   // 90%
-  if(FIND_SEQUENCE.length<7)return stats
+  if(FIND_SEQUENCE.length<7)return {stats, charts}
 
   if(FIND_SEQUENCE.length>7&&FIND_SEQUENCE.length<15){
     secondCount.push(...findSequence(FIND_SEQUENCE.slice(1,FIND_SEQUENCE.length), croppedArray))
@@ -71,10 +88,11 @@ const find = ()=>{
   secondCount.sort((a,b)=>{return a.from>b.from?1:-1})
   let [secoundDateAfter, croppedArraySecond] = findDateAfter(secondCount, croppedArray)
   secoundDateAfter = dataForChart(secoundDateAfter)
+  charts.push({p:'90', data: secoundDateAfter})
   stats.second = getStats(secoundDateAfter)
   // renderCharts('secontLineChart', secondChart.nativeElement, secoundDateAfter)  
   // 80% 
-  if(FIND_SEQUENCE.length<10)return stats
+  if(FIND_SEQUENCE.length<10)return {stats, charts}
   if(FIND_SEQUENCE.length<13){
     thirdCount.push(...findSequence(FIND_SEQUENCE.slice(2,FIND_SEQUENCE.length), croppedArraySecond))
     thirdCount.push(...findSequence(FIND_SEQUENCE.slice(0,-2), croppedArraySecond))
@@ -86,9 +104,10 @@ const find = ()=>{
   thirdCount.sort((a,b)=>{return a.from>b.from?1:-1})
   let [thirdDateAfter] = findDateAfter(thirdCount, croppedArraySecond)
   thirdDateAfter = dataForChart(thirdDateAfter)
+  charts.push({p:'80', data: thirdDateAfter})
   stats.third = getStats(thirdDateAfter)
   // renderCharts('thirdLineChart', thirdChart.nativeElement, thirdDateAfter)  
-  return stats
+  return {stats, charts}
 }
 
 function findSequence(sequense, data){
