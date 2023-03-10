@@ -30,10 +30,10 @@ const getAll = async (req, res, next) => {
     const data = []
     let [from, to] = date.split('-')
     while (Number(from) <= Number(to)) {
-      COUNT_AFTER = from
+      COUNT_AFTER = from 
       const obj = find()
       data.push({stats: obj, h: from})
-      from++;
+      from = Number(from) + 2;
     }
     stats.push({data, label:date})
   })
@@ -89,7 +89,11 @@ const find = ()=>{
   let [secoundDateAfter, croppedArraySecond] = findDateAfter(secondCount, croppedArray)
   secoundDateAfter = dataForChart(secoundDateAfter)
   charts.push({p:'90', data: secoundDateAfter})
-  stats.second = getStats(secoundDateAfter)
+  
+  if(secoundDateAfter.length){
+    stats.second = getStats(secoundDateAfter)
+  }
+
   // renderCharts('secontLineChart', secondChart.nativeElement, secoundDateAfter)  
   // 80% 
   if(FIND_SEQUENCE.length<10)return {stats, charts}
@@ -104,8 +108,10 @@ const find = ()=>{
   thirdCount.sort((a,b)=>{return a.from>b.from?1:-1})
   let [thirdDateAfter] = findDateAfter(thirdCount, croppedArraySecond)
   thirdDateAfter = dataForChart(thirdDateAfter)
+  if(!thirdDateAfter.length) return{stats, charts}
   charts.push({p:'80', data: thirdDateAfter})
   stats.third = getStats(thirdDateAfter)
+
   // renderCharts('thirdLineChart', thirdChart.nativeElement, thirdDateAfter)  
   return {stats, charts}
 }
