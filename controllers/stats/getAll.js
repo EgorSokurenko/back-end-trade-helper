@@ -67,6 +67,7 @@ const find = ()=>{
   thirdCount = []
   this.dataAfter = []
   count = findSequence(FIND_SEQUENCE, data)
+  console.log(count.length)
   let [dataAfter, croppedArray] = findDateAfter(count, data)
   // ONLY FOR CHARTS (maybe)
   let randomDataAfter = getRandomData(dataAfter)
@@ -85,6 +86,7 @@ const find = ()=>{
     secondCount.push(...findSequence(FIND_SEQUENCE.slice(1,FIND_SEQUENCE.length), croppedArray))
     secondCount.push(...findSequence(FIND_SEQUENCE.slice(0,-1), croppedArray))
   }
+  console.log("Secound",secondCount.length)
   secondCount.sort((a,b)=>{return a.from>b.from?1:-1})
   let [secoundDateAfter, croppedArraySecond] = findDateAfter(secondCount, croppedArray)
   secoundDateAfter = dataForChart(secoundDateAfter)
@@ -167,6 +169,7 @@ function getStats(data){
   sortedArray = [...sortedArray, zero].sort((a,b)=>a.value>b.value?-1:1)
 
   let stats = {
+    count:data.length,
     zero:((100*zero.value)/data.length).toFixed(1),
     plus:((100*plus.value)/data.length).toFixed(1),
     minus:((100*minus.value)/data.length).toFixed(1),
