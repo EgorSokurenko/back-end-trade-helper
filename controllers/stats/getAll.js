@@ -29,6 +29,7 @@ const getAll = async (req, res, next) => {
   DATE_AFTER.map(date=>{
     const data = []
     let [from, to] = date.split('-')
+    from = Number(from)
     while (Number(from) <= Number(to)) {
       COUNT_AFTER = from 
       const obj = find()
@@ -86,7 +87,6 @@ const find = ()=>{
     secondCount.push(...findSequence(FIND_SEQUENCE.slice(1,FIND_SEQUENCE.length), croppedArray))
     secondCount.push(...findSequence(FIND_SEQUENCE.slice(0,-1), croppedArray))
   }
-  console.log("Secound",secondCount.length)
   secondCount.sort((a,b)=>{return a.from>b.from?1:-1})
   let [secoundDateAfter, croppedArraySecond] = findDateAfter(secondCount, croppedArray)
   secoundDateAfter = dataForChart(secoundDateAfter)
